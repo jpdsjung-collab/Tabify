@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Tabify — Convert sheet music into beginner guitar tablature">
+  <meta name="theme-color" content="#ffffff">
+  <title>Tabify — Sheet Music to Guitar TAB</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div id="app" class="app">
+    <!-- Navigation -->
+    <header class="header" role="banner">
+      <div class="header__inner">
+        <div class="brand">
+          <svg class="brand__icon" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+            <rect width="28" height="28" rx="7" fill="url(#brandGrad)"/>
+            <text x="14" y="19" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" font-family="-apple-system, sans-serif">T</text>
+            <defs>
+              <linearGradient id="brandGrad" x1="0" y1="0" x2="28" y2="28">
+                <stop offset="0%" stop-color="#0071e3"/>
+                <stop offset="100%" stop-color="#5856d6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span class="brand__name">Tabify</span>
+        </div>
+        <span class="header__badge" id="statusBadge">Ready</span>
+      </div>
+    </header>
+
+    <main class="main" role="main">
+      <!-- Hero -->
+      <section class="hero">
+        <h1 class="hero__title">Sheet music,<br>guitar ready.</h1>
+        <p class="hero__subtitle">Upload an image, PDF, or MusicXML file and get beginner-friendly guitar tablature in seconds.</p>
+      </section>
+
+      <!-- Upload Zone -->
+      <section class="card upload-card" aria-labelledby="upload-heading">
+        <h2 id="upload-heading" class="sr-only">Upload Sheet Music</h2>
+
+        <div
+          class="upload-zone"
+          id="uploadZone"
+          role="button"
+          tabindex="0"
+          aria-label="Upload sheet music file"
+          aria-describedby="upload-hint"
+        >
+          <input
+            type="file"
+            id="fileInput"
+            class="upload-zone__input"
+            accept="image/*,.pdf,.xml,.musicxml,.mxl,application/pdf,application/xml,text/xml"
+            aria-hidden="true"
+          />
+          <div class="upload-zone__content" id="uploadPlaceholder">
+            <div class="upload-zone__icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                <path d="M20 6v20M12 14l8-8 8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 28v4h24v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="upload-zone__label">Drop your sheet music here</p>
+            <p class="upload-zone__hint" id="upload-hint">JPEG, PNG, PDF, or MusicXML · Max 25 MB</p>
+            <button type="button" class="btn btn--primary" id="browseBtn">Choose File</button>
+          </div>
+
+          <!-- Preview container (shown after file selected) -->
+          <div class="preview hidden" id="previewContainer" aria-live="polite">
+            <div class="preview__header">
+              <span class="preview__filename" id="previewFilename"></span>
+              <button type="button" class="btn btn--ghost btn--sm" id="clearBtn" aria-label="Remove file">✕</button>
+            </div>
+            <div class="preview__body" id="previewBody">
+              <!-- Image, PDF canvas, or XML badge injected here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload progress -->
+        <div class="progress hidden" id="progressContainer" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress__track">
+            <div class="progress__bar" id="progressBar"></div>
+          </div>
+          <p class="progress__label" id="progressLabel">Uploading…</p>
+        </div>
+
+        <button type="button" class="btn btn--primary btn--full btn--lg hidden" id="convertBtn">
+          Convert to Guitar TAB
+        </button>
+      </section>
+
+      <!-- Processing state -->
+      <section class="processing hidden" id="processingSection" aria-live="polite">
+        <div class="processing__spinner" aria-hidden="true"></div>
+        <p class="processing__text" id="processingText">Analyzing sheet music…</p>
+      </section>
+
+      <!-- Results -->
+      <section class="results hidden" id="resultsSection" aria-labelledby="results-heading">
+        <div class="results__header">
+          <h2 id="results-heading" class="results__title">Your Guitar TAB</h2>
+          <p class="results__meta" id="resultsMeta"></p>
+        </div>
+
+        <!-- Note list -->
+        <div class="card notes-card hidden" id="notesCard">
+          <h3 class="card__title">Detected Notes</h3>
+          <ul class="notes-list" id="notesList"></ul>
+        </div>
+
+        <!-- TAB display -->
+        <div class="card tab-card">
+          <div class="tab-card__toolbar">
+            <h3 class="card__title">Tablature</h3>
+            <div class="tab-card__actions">
+              <button type="button" class="btn btn--secondary btn--sm" id="copyTabBtn" title="Copy TAB">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M3 11V3a1 1 0 011-1h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Copy
+              </button>
+              <button type="button" class="btn btn--secondary btn--sm" id="downloadPdfBtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                PDF
+              </button>
+              <button type="button" class="btn btn--secondary btn--sm" id="downloadPngBtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                PNG
+              </button>
+            </div>
+          </div>
+          <pre class="tab-display" id="tabDisplay" aria-label="Guitar tablature output"></pre>
+        </div>
+
+        <button type="button" class="btn btn--ghost btn--full" id="newConversionBtn">Convert Another File</button>
+      </section>
+
+      <!-- Error toast -->
+      <div class="toast hidden" id="toast" role="alert" aria-live="assertive">
+        <span class="toast__message" id="toastMessage"></span>
+        <button type="button" class="toast__close" id="toastClose" aria-label="Dismiss">✕</button>
+      </div>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      <p>Tabify · Beginner guitar tablature from sheet music</p>
+    </footer>
+  </div>
+
+  <!-- PDF.js for in-browser PDF preview -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

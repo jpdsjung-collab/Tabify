@@ -1,0 +1,14 @@
+{
+  "name": "tabify",
+  "version": "1.0.0",
+  "description": "Convert sheet music into beginner guitar tablature",
+  "private": true,
+  "scripts": {
+    "start": "npm start --prefix backend",
+    "dev": "npm run dev --prefix backend",
+    "install:all": "npm install --prefix backend"
+  },
+  "keywords": ["guitar", "tablature", "musicxml", "audiveris", "omr"],
+  "author": "Tabify",
+  "license": "MIT"
+}

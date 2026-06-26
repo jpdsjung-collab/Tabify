@@ -1,0 +1,124 @@
+/**
+ * Page layout — mobile-first responsive structure.
+ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Header */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .header {
+    background: rgba(28, 28, 30, 0.72);
+  }
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-5);
+  height: var(--header-height);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.brand__name {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.02em;
+}
+
+.header__badge {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-success);
+  background: rgba(52, 199, 89, 0.12);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+.header__badge--warning {
+  color: var(--color-warning);
+  background: rgba(255, 149, 0, 0.12);
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-12);
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.hero__title {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: var(--space-4);
+  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero__subtitle {
+  font-size: var(--text-lg);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: var(--space-6) var(--space-5);
+  color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+  border-top: 1px solid var(--color-border-light);
+}
+
+/* Tablet+ */
+@media (min-width: 768px) {
+  .hero__title {
+    font-size: 2.75rem;
+  }
+
+  .main {
+    padding-top: var(--space-10);
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .hero__title {
+    font-size: 3rem;
+  }
+}
