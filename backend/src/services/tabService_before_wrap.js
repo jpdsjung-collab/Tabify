@@ -1,4 +1,3 @@
-```js
 const STRING_LABELS = {
   1: 'e|',
   2: 'B|',
@@ -9,12 +8,18 @@ const STRING_LABELS = {
 };
 
 const COLUMN_WIDTH = 3;
-const MEASURES_PER_SYSTEM = 4;
 
 function formatFretCell(fret) {
-  if (fret === 0) return '0--';
+  if (fret === 0) {
+    return '0--';
+  }
+
   const str = String(fret);
-  if (str.length === 1) return '-' + str + '-';
+
+  if (str.length === 1) {
+    return '-' + str + '-';
+  }
+
   return str + '-';
 }
 
@@ -22,53 +27,26 @@ function emptyCell() {
   return '---';
 }
 
-function createTabLines() {
+function generateTab(notesWithFingering, meta = {}) {
   const lines = {};
 
   for (let s = 1; s <= 6; s++) {
     lines[s] = STRING_LABELS[s];
   }
 
-  return lines;
-}
-
-function closeTabLines(lines) {
-  for (let s = 1; s <= 6; s++) {
-    lines[s] += '|';
-  }
-
-  return [1, 2, 3, 4, 5, 6].map((s) => lines[s]);
-}
-
-function generateTab(notesWithFingering, meta = {}) {
-  let lines = createTabLines();
-
-  const systems = [];
   const legend = [];
-
   let currentMeasure = null;
-  let measuresInSystem = 0;
 
   notesWithFingering.forEach((note) => {
     const measure = note.measure || 1;
-    const isNewMeasure = currentMeasure !== measure;
 
-    if (isNewMeasure && currentMeasure !== null) {
-      if (measuresInSystem === MEASURES_PER_SYSTEM) {
-        systems.push(closeTabLines(lines));
-        lines = createTabLines();
-        measuresInSystem = 0;
-      } else {
-        for (let s = 1; s <= 6; s++) {
-          lines[s] += '|';
-        }
+    if (currentMeasure !== null && measure !== currentMeasure) {
+      for (let s = 1; s <= 6; s++) {
+        lines[s] += '|';
       }
     }
 
-    if (isNewMeasure) {
-      measuresInSystem += 1;
-      currentMeasure = measure;
-    }
+    currentMeasure = measure;
 
     const fingering = note.fingering;
 
@@ -82,26 +60,32 @@ function generateTab(notesWithFingering, meta = {}) {
 
     if (!note.isRest && fingering && fingering.playable) {
       const fretLabel = fingering.fret === 0 ? 'open' : 'fret ' + fingering.fret;
-      legend.push(
-        legend.length + 1 + '. ' + note.name + ' → string ' + fingering.string + ' (' + fretLabel + ')'
-      );
+      const legendEntry =
+        legend.length +
+        1 +
+        '. ' +
+        note.name +
+        ' → string ' +
+        fingering.string +
+        ' (' +
+        fretLabel +
+        ')';
+
+      legend.push(legendEntry);
     }
   });
 
-  systems.push(closeTabLines(lines));
+  for (let s = 1; s <= 6; s++) {
+    lines[s] += '|';
+  }
 
-  const orderedLines = systems.reduce((allLines, system, index) => {
-    if (index > 0) {
-      allLines.push('');
-    }
-
-    return allLines.concat(system);
-  }, []);
-
+  const orderedLines = [1, 2, 3, 4, 5, 6].map((s) => lines[s]);
   const header = buildHeader(meta);
-  const legendBlock = legend.length > 0
-    ? '\n\n/* Fingering Guide */\n' + legend.join('\n')
-    : '';
+
+  let legendBlock = '';
+  if (legend.length > 0) {
+    legendBlock = '\n\n/* Fingering Guide */\n' + legend.join('\n');
+  }
 
   return {
     ascii: header + '\n' + orderedLines.join('\n') + legendBlock,
@@ -124,15 +108,15 @@ function buildHeader(meta) {
 
   const header = [
     '/* Tabify — Beginner Guitar TAB */',
-    '/* ' + title + composer + ' */'
+    '/* ' + title + composer + ' */',
   ];
 
   if (meta.difficulty && meta.difficulty.stars) {
     header.push(
       '/* Difficulty: ' +
-      '★'.repeat(meta.difficulty.stars) +
-      '☆'.repeat(5 - meta.difficulty.stars) +
-      ' */'
+        '★'.repeat(meta.difficulty.stars) +
+        '☆'.repeat(5 - meta.difficulty.stars) +
+        ' */'
     );
   }
 
@@ -148,4 +132,3 @@ module.exports = {
   STRING_LABELS,
   COLUMN_WIDTH,
 };
-```
